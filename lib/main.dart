@@ -30,17 +30,32 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class ListItem<T> {
+class PreviewItem<Widget> {
   bool isSelected = false;
-  T data;
-  ListItem(this.data);
+
+  Widget data;
+  PreviewItem(this.data);
+}
+
+class Category {
+  final FaIcon icon;
+  final String name;
+  bool? isSelected;
+
+  Category({required this.icon, required this.name, this.isSelected = false});
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Widget> items = <Widget>[];
+  List<PreviewItem> items = [];
 
   int maxTiles = 4;
   int currentTiles = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    List<PreviewItem> items = [];
+  }
 
   void addTileToList(item) {
     setState(() {
@@ -76,14 +91,23 @@ class _MyHomePageState extends State<MyHomePage> {
                     itemBuilder: (BuildContext context, index) {
                       return GestureDetector(
                         onTap: () {
-                          if (currentTiles < maxTiles) {
-                            addTileToList(categories[index].icon);
+                          if (currentTiles <= maxTiles &&
+                              !items[index].isSelected) {
+                            setState(() {
+                              items.add(
+                                  PreviewItem<Widget>(categories[index].icon));
+                              categories[index].isSelected =
+                                  !categories[index].isSelected!;
+                            });
                           }
                         },
                         child: Container(
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20.0),
-                              border: Border.all(color: Colors.blue.shade400)),
+                              border: Border.all(
+                                  color: categories[index].isSelected!
+                                      ? Colors.white
+                                      : Colors.blue.shade400)),
                           padding: const EdgeInsets.all(8),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -119,12 +143,3 @@ final List<Category> categories = [
   Category(
       icon: FaIcon(FontAwesomeIcons.solidPlayCircle), name: 'Remote Display')
 ];
-
-class Category {
-  final FaIcon icon;
-  final String name;
-  final bool isSelected;
-
-  const Category(
-      {required this.icon, required this.name, this.isSelected = false});
-}
